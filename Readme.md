@@ -24,3 +24,7 @@ export FLASK_APP=server.py
 python -m flask run --host=0.0.0.0
 ```
 
+# 3. Basic usage
+
+localhost:5000/read?tag=Taylor%20Swift
+localhost:5000/write?tag=Taylor%20Swift&write="https://www.taylorswift.com"
