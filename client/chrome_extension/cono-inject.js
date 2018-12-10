@@ -31,7 +31,10 @@ tooltip.innerHTML = `
 tippy.setDefaults({
 	interactive: true,
 	theme: "cono",
-	hideOnClick: "false"
+	hideOnClick: "false",
+	arrow: true,
+	arrowType: 'round',
+	interactiveDebounce: 100, // doesn't seem to fix tooltip closing sometimes on clicks
 });
 
 redBox.addEventListener("click", (e) => {

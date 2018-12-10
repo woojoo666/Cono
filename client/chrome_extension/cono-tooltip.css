@@ -76,6 +76,11 @@
 }
 
 
-.tippy-tooltip.cono-theme .tippy-backdrop {
-	background-color: #eee;
+.tippy-tooltip.cono-theme {
+	background-color: #efefef;
+	border-radius: 10px;
+}
+
+.cono-theme .tippy-roundarrow {
+	fill: #efefef;
 }
