@@ -43,9 +43,9 @@ python -m flask run --host=0.0.0.0
 # 3. Basic usage
 
 localhost:5000/read?tag=Taylor%20Swift
-localhost:5000/write?tag=Taylor%20Swift&write="https://www.taylorswift.com"
+localhost:5000/write?tag=Taylor%20Swift&entity="https://www.taylorswift.com"
 
 If you're directly typing this into a Chrome URL Bar, Chrome should automatically convert spaces into %20, so you can also do the following:
 
 localhost:5000/read?tag=Taylor Swift
-localhost:5000/write?tag=Taylor Swift&write="https://www.taylorswift.com"
+localhost:5000/write?tag=Taylor Swift&entity="https://www.taylorswift.com"

@@ -32,6 +32,8 @@ def read():
 
     entities = []
     documents = mongo.db.maxdb.find({"tag": "Taylor Swift"})
+
+    print(documents)
     for document in documents:
         entities.append(document["entity"])
     print(entities)
@@ -45,6 +47,8 @@ def write():
     ret = {}
     tag = request.args.get("tag")
     entity = request.args.get("entity")
+
+    print(tag,entity)
 
     if tag is None or entity is None:
         ret["error_msg"] =  "Both tag and entity must be passed"
