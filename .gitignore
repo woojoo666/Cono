@@ -1,0 +1,4 @@
+virtualenv/
+*.swp
+server/nohup.out
+server/__pycache__
