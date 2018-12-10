@@ -13,8 +13,42 @@ redBox.style.color = "white";
 
 document.body.appendChild(redBox);
 
+var tooltip = document.createElement('div');
+tooltip.innerHTML = `
+<div class="cono-tooltip">
+	<div class="cono-tag cono-personal">Foo</div>
+	<div class="cono-tag">Bar</div>
+	<div class="cono-tag cono-personal">Baz</div>
+	<div class="cono-tag">Zed</div>
+	<div class="cono-add"></div>
+	<div class="cono-add-dialogue">
+		<input type="text"/>
+		<div>press enter to add<div>
+	</div>
+</div>
+`;
+
+tippy.setDefaults({
+	interactive: true,
+	theme: "cono",
+	hideOnClick: "false"
+});
+
 redBox.addEventListener("click", (e) => {
-	tippy(document.querySelectorAll('a'),  { content: "I'm a tooltip!" });
+	// For every "reference" element, tippy will create a "tippy instance", a clone of our tooltip object.
+	// We need to initialize each one of these clones. Because each tippy instance is lazily created (see Tippy docs),
+	// we wait until the first time it is shown before initializing it.
+	tippy(document.querySelectorAll('a'),  { content: tooltip.innerHTML, onMount: (tippyInstance) => {
+			var element = tippyInstance.popperChildren.content;
+			if (!element.classList.contains('cono-tooltip-initialized')) {
+				initTooltip(element);
+
+				// add a tag to prevent it from being initialized multiple times
+				element.classList.add('cono-tooltip-initialized');
+			}
+		},
+	});
+
 	redBox.innerHTML = "<p>enabled!</p><p>hover over links to see their tags</p>"
 });
 

@@ -13,8 +13,8 @@
 	},
 	"content_scripts": [{
 			"matches": ["<all_urls>"],
-			"js": ["cono-inject.js", "tippy.all.min.js"],
-			"css": ["cono-inject.css"]
+			"js": ["tippy.all.min.js", "cono-inject.js", "cono-tooltip.js"],
+			"css": ["cono-inject.css", "cono-tooltip.css"]
 	}],
 	"permissions": ["sessions","tabs","storage"],
     "web_accessible_resources": ["*"]
