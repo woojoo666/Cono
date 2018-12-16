@@ -16,6 +16,11 @@ tag_entity_validator = {"$jsonSchema":
                   "url" : {
                     "bsonType" : "string",
                     "description" : "Url representing this entity."
+                  },
+                  "tag_count" : {
+                    "bsonType" : "int",
+                    "minimum" : 1,
+                    "description" : "Number of distinct users that have tagged this entity with same tag."
                   }
                 }
             }

@@ -1,64 +1,87 @@
+import sys
+
+sys.path.insert(0, 'db/')
+
 from flask import (
     Flask,
     request,
 )
 from flask_pymongo import PyMongo
+from pymongo import MongoClient
+import schema
 import json
+import schema
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test"
-mongo = PyMongo(app)
+client = MongoClient() 
+db = client.prod
 
 @app.route("/")
 def base():
-
-    ret = {}
-    ret["tag"] = "Taylor Swift"
-    ret["entitites"] = [
-            "https://www.taylorswift.com",
-            "https://www.youtube.com/taylorswift",
-            "https://www.instagram.com/taylorswift/?hl=en",
-            ]
-    return json.dumps(ret)
+    return "Welcome to Cono."
 
 @app.route("/read")
 def read():
     tag = request.args.get("tag")
     ret = {}
 
-    if tag is None:
-        ret["error_msg"] = "No tag passed"
-        return json.dumps(ret)
+    documents = db.cono_tag_entity_db.find({"tag":tag})
 
-    entities = []
-    documents = mongo.db.maxdb.find({"tag": "Taylor Swift"})
-
-    print(documents)
+    print (documents.count())
     for document in documents:
-        entities.append(document["entity"])
-    print(entities)
-    ret = {}
-    ret["tag"] = tag
-    ret["entitites"] = entities
+        print(document['entity'])
+        ret[document['entity']['url']] = document['entity']
     return json.dumps(ret)
 
 @app.route("/write")
 def write():
     ret = {}
     tag = request.args.get("tag")
-    entity = request.args.get("entity")
+    url = request.args.get("url")
 
-    print(tag,entity)
+    print(tag, url)
 
-    if tag is None or entity is None:
+    if tag is None or url is None:
         ret["error_msg"] =  "Both tag and entity must be passed"
         return json.dumps(ret)
 
+
     try:
-        mongo.db.maxdb.insert_one({"tag": tag, "entity": entity})
+        documents = db.cono_tag_entity_db.find({"tag":tag})
     except Exception as e:
         ret["exception_message"] = str(e)
         ret["result"] = "Fail"
+        return json.dumps(ret)
 
-    ret["result"] = "Success"
-    return json.dumps(ret)
+    if documents.count() == 0:
+        try:
+            entity = {"url" : url, "tag_count" : 1}
+            tag_entity_pair = {"tag" : tag}
+            db.cono_tag_entity_db.insert_one({"tag": tag, "entity": entity})
+            print("Created new tag, entity.")
+        except Exception as e:
+            ret["exception_message"] = str(e)
+            ret["result"] = "Fail"
+            return json.dumps(ret)
+
+        ret["result"] = "Success"
+        return json.dumps(ret)
+    else:
+        for document in documents:
+            entity = document['entity']
+            if entity['url'] == url:
+                entity['tag_count'] += 1
+                print("Incremented tag count to", entity['tag_count'])
+                db.cono_tag_entity_db.replace_one({"tag" : tag}, {"tag": tag, "entity": entity}, True)
+                print("Added to existing entity.")
+                ret["result"] = "Success"
+                return json.dumps(ret)
+
+        entity = {"url" : url, "tag_count" : 1}
+        tag_entity_pair = {"tag" : tag}
+        db.cono_tag_entity_db.insert_one({"tag": tag, "entity": entity})
+        print("Added entity to existing tag.")
+        ret["result"] = "Success"
+        return json.dumps(ret)
+

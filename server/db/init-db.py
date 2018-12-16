@@ -19,3 +19,9 @@ query = [('collMod', 'cono_tag_entity_db'),
         ('validationLevel', 'moderate')]
 query = OrderedDict(query)
 db.command(query)
+
+query = [('collMod', 'cono_tag_entity_db'),
+        ('validator', schema.tag_entity_validator),
+        ('validationLevel', 'moderate')]
+query = OrderedDict(query)
+db.command(query)
