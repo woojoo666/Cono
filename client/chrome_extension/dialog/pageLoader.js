@@ -5,7 +5,7 @@ var pages = {
 	},
 	main: {
 		html: 'main.html',
-		onloadFn: () => console.log('main page loaded') // TODO: replace this with a real function
+		onloadFn: main_onloadFn
 	}
 }
 
@@ -33,7 +33,7 @@ function onMessage(request) {
 // routes broadcasts to unified message receiver
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	var response = onMessage(request);
-	sendResponse(response);
+	if (response) sendResponse(response);
 });
 
 // unified message sender
@@ -43,7 +43,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 // data (eg 'username') through the same mechanism as message receivers (eg 'login_updated'),
 // we have to use this workaround.
 function sendMessage(msg, responseFn) {
-	chrome.runtime.sendMessage({ action: 'popup_init' }, response => {
+	chrome.runtime.sendMessage(msg, response => {
+		if (!response) return;
 		onMessage(response);
 		if (responseFn) responseFn(response);
 	});
