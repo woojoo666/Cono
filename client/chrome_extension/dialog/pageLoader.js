@@ -15,24 +15,38 @@ function pageLoader(page) {
 
 var username;
 
-function updateLogin(info) {
-	if (info.username) {
-		username = info.username;
-		pageLoader(pages.main);
-	} else {
-		pageLoader(pages.login);
-	}
-}
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+// unified message reciever
+function onMessage(request) {
 	console.log(request);
 	switch (request.action) {
 		case "login_updated":
-			updateLogin(request);
+			if (request.username) {
+				username = request.username;
+				pageLoader(pages.main);
+			} else {
+				pageLoader(pages.login);
+			}
 			break;
 	}
+}
+
+// routes broadcasts to unified message receiver
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	var response = onMessage(request);
+	sendResponse(response);
 });
 
-chrome.runtime.sendMessage({ action: 'popup_init' }, function (response) {
-		updateLogin(response);
+// unified message sender
+// routes responses through the global receiver "onMessage" as well as the response callback
+// this is necessary because, unlike content scripts, extension popups can't receive direct
+// messages from the background script, so if we want requests (eg 'popup_init') to update
+// data (eg 'username') through the same mechanism as message receivers (eg 'login_updated'),
+// we have to use this workaround.
+function sendMessage(msg, responseFn) {
+	chrome.runtime.sendMessage({ action: 'popup_init' }, response => {
+		onMessage(response);
+		if (responseFn) responseFn(response);
 	});
+}
+
+sendMessage({ action: 'popup_init' });

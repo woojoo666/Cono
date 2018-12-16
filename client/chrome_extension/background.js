@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		case 'sign_out':
 			broadcast({ action: 'login_updated', username: undefined }); // use empty login info to indicate signed out
 		case 'popup_init':
-			response = { username: username };
+			response = { action: 'login_updated', username: username };
 			break;
 		case 'content_script_init':
 			chrome.tabs.sendMessage(sender.tab.id, { action: 'login_updated', username: username }, function(response) {
