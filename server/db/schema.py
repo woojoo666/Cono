@@ -1,0 +1,29 @@
+#  $jsonSchema expression type is prefered.  New since v3.6 (2017):
+tag_entity_validator = {"$jsonSchema":
+  {
+         "bsonType": "object",
+         "required": ["tag", "entity"],
+         "properties": {
+            "tag": {
+               "bsonType": "string",
+               "description": "Canonical key tag across the internet."
+            },
+            "entity" : {
+                "bsonType" : "object",
+                "required" : ["url"],
+                "description" : "Entity associated with given tag.",
+                "properties" : {
+                  "url" : {
+                    "bsonType" : "string",
+                    "description" : "Url representing this entity."
+                  },
+                  "tag_count" : {
+                    "bsonType" : "int",
+                    "minimum" : 1,
+                    "description" : "Number of distinct users that have tagged this entity with same tag."
+                  }
+                }
+            }
+         }
+  }
+}
