@@ -37,6 +37,8 @@ tippy.setDefaults({
 	interactiveDebounce: 100, // doesn't seem to fix tooltip closing sometimes on clicks
 });
 
+var username;
+
 redBox.addEventListener("click", (e) => {
 	// For every "reference" element, tippy will create a "tippy instance", a clone of our tooltip object.
 	// We need to initialize each one of these clones. Because each tippy instance is lazily created (see Tippy docs),
@@ -58,4 +60,20 @@ redBox.addEventListener("click", (e) => {
 //code to send message to open notification. This will eventually move into my extension logic
 chrome.extension.sendMessage("test", (response) =>{
 	console.log(response);
+});
+
+chrome.extension.sendMessage({ action: 'content_script_init' });
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	console.log(request);
+	switch (request.action) {
+		case 'login_updated':
+			if (request.username) {
+				username = request.username;
+				console.log('username set to ' + username);
+			} else { // signed out
+				console.log('signed out');
+			}
+			break;
+	}
 });
