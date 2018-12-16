@@ -23,6 +23,6 @@
 //			"16": "images/icon16.png" // TODO
 		},
 		"default_title": "Cono",
-		"default_popup": "dialog/dialog_main.html"
+		"default_popup": "dialog/page_container.html"
 	}
 }
