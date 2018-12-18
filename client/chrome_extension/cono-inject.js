@@ -51,6 +51,7 @@ chrome.extension.sendMessage({ action: 'content_script_init' });
 
 // TODO: content scripts on background tabs are not receiving messages. Not sure why not.
 //       We might have to manually fetch data when tabs are brought back to foreground.
+// TODO: return false if not sending a response
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	console.log(request);
 	switch (request.action) {
@@ -63,10 +64,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			}
 			break;
 		case 'toggle-tooltips':
-			if (tippyCollection)
+			if (tippyCollection) {
 				tippyCollection.destroyAll();
-			else
+				tippyCollection = null;
+			} else {
 				createTooltips();
+			}
+			break;
+		case 'get-tooltips-enabled':
+			sendResponse({ tooltips_enabled: (tippyCollection != null) });
 			break;
 	}
 });

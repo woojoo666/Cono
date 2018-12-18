@@ -31,7 +31,7 @@ function pageLoader(page) {
 var username;
 
 // unified message reciever
-function onMessage(request) {
+function onMessage(request, sendResponse) {
 	console.log(request);
 	switch (request.action) {
 		case "login_updated":
@@ -46,9 +46,9 @@ function onMessage(request) {
 }
 
 // routes broadcasts to unified message receiver
+// TODO: return false if not sending a response
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	var response = onMessage(request);
-	if (response) sendResponse(response);
+	onMessage(request, sendResponse);
 });
 
 // unified message sender
@@ -59,7 +59,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 // we have to use this workaround.
 function sendMessage(msg, responseFn) {
 	chrome.runtime.sendMessage(msg, response => {
-		if (!response) return;
+		if (response == undefined) return;
 		onMessage(response);
 		if (responseFn) responseFn(response);
 	});

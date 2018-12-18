@@ -17,6 +17,8 @@ var username = null;
 // 1. regular message passing, just request and response
 // 2. state management, involving requests (eg 'popup_init'), updates (eg 'login'), and broadcasts (eg 'login_updated').
 
+// TODO: return false if not sending a response
+// return true if sending a response asynchronously (see https://stackoverflow.com/questions/20077487/)
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	console.log(request);
 	var response;
@@ -38,18 +40,37 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			response = { action: 'login_updated', username: username };
 			break;
 		case 'content_script_init':
-			chrome.tabs.sendMessage(sender.tab.id, { action: 'login_updated', username: username }, function(response) {
+			chrome.tabs.sendMessage(sender.tab.id, { action: 'login_updated', username: username }, response => {
 				console.log(response);
 			});
 			break;
 		case 'toggle-tooltips':
-			// TODO: super janky, doesn't broadcast to background tabs (?), replace with something more robust
-			//       eg some global state, or enable/disable specific urls or tabs
-			broadcast({action: 'toggle-tooltips'});
+			// tells the current tab/page to toggle tagging
+			getCurrentTab( tab => chrome.tabs.sendMessage(tab.id, {action: 'toggle-tooltips'}) );
 			break;
+		case 'get-tooltips-enabled':
+			// when popup asks if tooltips is enabled, forward the request to content script, then send the response back to popup
+			getCurrentTab( tab => {
+				chrome.tabs.sendMessage(tab.id, {action: 'get-tooltips-enabled'}, response => sendResponse(response) )
+			});
+			return true; // return true to indicate that we are sending a response asynchronously
 	}
 	sendResponse(response);
 });
+
+// necessary for extension popup to figure out its parent tab
+function getCurrentTab(callback) {
+	// active: true, currentWindow: true
+	chrome.tabs.query({active: true, lastFocusedWindow: true}, function (tabs) {
+		var tab = tabs[0];
+		if (!tab) {
+			console.log('Error: no current active tab??');
+			return;
+		}
+		// var url = tabs[0].url;
+		callback(tab);
+	});
+}
 
 // broadcast to all tabs
 function broadcast(msg, responseFn) {

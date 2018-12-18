@@ -6,14 +6,15 @@ pages.main.init = function () {
 	var toggleButton = $('button.toggle-tooltips');
 
 	function updateToggleButton() {
-		toggleButton.text( toggleButton.hasClass('tooltips-enabled') ? 'Tagging Enabled' : 'Tagging Disabled' );
+		sendMessage({action: 'get-tooltips-enabled'}, response => {
+			toggleButton.toggleClass('tooltips-enabled', response.tooltips_enabled); // enable class based on response
+			toggleButton.text( response.tooltips_enabled ? 'Tag Tooltips Enabled' : 'Tag Tooltips Disabled' );
+		});
 	}
 
 	toggleButton.click(function (e) {
 		sendMessage({ action: 'toggle-tooltips' });
 
-		// TODO: this is a hack. Should depend on the actual state of the current tab/page.
-		toggleButton.toggleClass('tooltips-enabled');
 		updateToggleButton();
 	});
 
