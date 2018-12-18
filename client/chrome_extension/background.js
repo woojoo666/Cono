@@ -42,6 +42,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 				console.log(response);
 			});
 			break;
+		case 'toggle-tooltips':
+			// TODO: super janky, doesn't broadcast to background tabs (?), replace with something more robust
+			//       eg some global state, or enable/disable specific urls or tabs
+			broadcast({action: 'toggle-tooltips'});
+			break;
 	}
 	sendResponse(response);
 });
