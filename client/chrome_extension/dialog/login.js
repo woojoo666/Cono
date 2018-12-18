@@ -1,4 +1,4 @@
-function login_onloadFn () {
+pages.login.init = function () {
 	$('button.sign-in').click(() => {
 		var username = $('input.username').val();
 		chrome.runtime.sendMessage({ action: "login", username: username },

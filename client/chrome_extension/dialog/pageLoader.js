@@ -1,16 +1,31 @@
 var pages = {
 	login: {
 		html: 'login.html',
-		onloadFn: login_onloadFn // defined in login.js
+		js: 'login.js',
+		init: null // bound in login.js
 	},
 	main: {
 		html: 'main.html',
-		onloadFn: main_onloadFn
-	}
+		js: 'main.js',
+		init: null // bound in main.js
+	},
+}
+
+function loadScript(file, onload) {
+	var scriptEl = document.createElement('script');
+	scriptEl.type = 'text/javascript';
+	scriptEl.src = file;
+	scriptEl.onload = onload;
+	document.body.appendChild(scriptEl);
 }
 
 function pageLoader(page) {
-	$('.page-container').load(page.html, page.onloadFn);
+	$('.page-container').load(page.html, () => {
+		if (!page.init) // if init function undefined, the script needs to be loaded first
+			loadScript(page.js, () => page.init()); // after page.js is loaded, call page.init
+		else
+			page.init(); // js is already loaded, call init
+	});
 }
 
 var username;
