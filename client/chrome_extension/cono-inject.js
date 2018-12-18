@@ -13,6 +13,8 @@ tooltip.innerHTML = `
 </div>
 `;
 
+// TODO: the arrow looks ugly. Instead, we should always have the tooltip display above the link,
+//       so we can get rid of the arrow.
 tippy.setDefaults({
 	interactive: true,
 	theme: "cono",
@@ -58,6 +60,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 				username = request.username;
 				console.log('username set to ' + username);
 			} else { // signed out
+				// TODO: when signing out, disabled all tooltips across all tabs, because they are user-dependent
 				console.log('signed out');
 			}
 			break;
