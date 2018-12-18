@@ -60,7 +60,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 // necessary for extension popup to figure out its parent tab
 function getCurrentTab(callback) {
-	// active: true, currentWindow: true
+	// TODO: should I use "lastFocusedWindow: true" or "currentWindow: true"?
 	chrome.tabs.query({active: true, lastFocusedWindow: true}, function (tabs) {
 		var tab = tabs[0];
 		if (!tab) {
@@ -76,7 +76,7 @@ function getCurrentTab(callback) {
 function broadcast(msg, responseFn) {
 	console.log('broadcast: ' + msg.action);
 	chrome.extension.sendMessage(msg, responseFn);
-	chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+	chrome.tabs.query({}, function (tabs) {
 		tabs.forEach(tab => {
 			chrome.tabs.sendMessage(tab.id, msg, responseFn);
 		});

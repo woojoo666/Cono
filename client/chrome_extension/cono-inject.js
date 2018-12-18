@@ -49,8 +49,6 @@ chrome.extension.sendMessage("test", (response) =>{
 
 chrome.extension.sendMessage({ action: 'content_script_init' });
 
-// TODO: content scripts on background tabs are not receiving messages. Not sure why not.
-//       We might have to manually fetch data when tabs are brought back to foreground.
 // TODO: return false if not sending a response
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	console.log(request);
