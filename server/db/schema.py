@@ -1,4 +1,5 @@
 #  $jsonSchema expression type is prefered.  New since v3.6 (2017):
+# TODO(vishvanand): Replace entity object with list of entities.
 tag_entity_validator = {"$jsonSchema":
   {
          "bsonType": "object",
