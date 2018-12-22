@@ -4,3 +4,4 @@ server/nohup.out
 server/__pycache__
 server/echo
 cono
+*.pyc
