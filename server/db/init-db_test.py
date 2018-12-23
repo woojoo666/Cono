@@ -10,6 +10,7 @@ db = client.testX
 
 db.cono_tag_entity_testdb.drop()
 
+print("Create tag entity testdb.")
 db.create_collection("cono_tag_entity_testdb")
 
 query = [('collMod', 'cono_tag_entity_testdb'),
@@ -17,6 +18,16 @@ query = [('collMod', 'cono_tag_entity_testdb'),
         ('validationLevel', 'moderate')]
 query = OrderedDict(query)
 db.command(query)
+
+print("Create user tag url testdb.")
+db.create_collection("cono_user_tag_entity_testdb")
+
+query = [('collMod', 'cono_user_tag_url_testdb'),
+        ('validator', schema.user_tag_url_validator),
+        ('validationLevel', 'moderate')]
+query = OrderedDict(query)
+db.command(query)
+
 
 
 # Test that random junk can't be inserted into db.
@@ -29,9 +40,10 @@ except:
 
 # Test valid tag entity pair
 try:
-    okdoc = {"tag" : "TaylorSwift", "entity" : {"url" : "taylorswift/red.com"}}
+    okdoc = {"tag" : "TaylorSwift", "entity" : {"url" : "taylorswift/red.com", "upvote_count"}}
     print(okdoc['tag'])
     db.cono_tag_entity.insert(okdoc)
+
     assert(True == True)
 except:
     print(("exc:", sys.exc_info()))

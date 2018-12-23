@@ -27,3 +27,24 @@ tag_entity_validator = {"$jsonSchema":
          }
   }
 }
+
+user_tag_url_validator = {"$jsonSchema":
+  {
+         "bsonType": "object",
+         "required": ["tag", "entity"],
+         "properties": {
+            "username": {
+               "bsonType": "string",
+               "description": "Authenticated user on the server."
+            },
+            "tag": {
+               "bsonType": "string",
+               "description": "Canonical key tag across the internet."
+            },
+            "url" : {
+              "bsonType" : "string",
+              "description" : "Url representing this entity."
+            }
+         }
+  }
+}
