@@ -29,7 +29,7 @@ def read():
     documents = db.cono_tag_entity_db.find({"tag":tag})
 
     print (documents.count())
-    for document in documents:
+    for document in documents:`
         print(document['entity'])
         ret[document['entity']['url']] = document['entity']
     return json.dumps(ret)
@@ -39,6 +39,7 @@ def write():
     ret = {}
     tag = request.args.get("tag")
     url = request.args.get("url")
+    username = request.args.get("username")
 
     print(tag, url)
 
@@ -53,12 +54,24 @@ def write():
         ret["exception_message"] = str(e)
         ret["result"] = "Fail"
         return json.dumps(ret)
+    try:
+        username_tags = db.user_tag_url_db.find({"username" : username, "tag" : tag, "url" : url})
+    except Exception as e:
+        ret["exception_message"] = str(e)
+        ret["result"] = "Fail"
+        return json.dumps(ret)
+
+    if entities.count() == 0:
+        print("User has already tagged this url.")
+        ret["result"] = "Fail"
+        return json.dumps(ret)
 
     if documents.count() == 0:
         try:
             entity = {"url" : url, "tag_count" : 1}
             tag_entity_pair = {"tag" : tag}
             db.cono_tag_entity_db.insert_one({"tag": tag, "entity": entity})
+            db.cono_user_tag_url_db.insert_one({"username" : username, "tag" : tag, "url" : url})
             print("Created new tag, entity.")
         except Exception as e:
             ret["exception_message"] = str(e)
