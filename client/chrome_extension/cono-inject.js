@@ -7,7 +7,7 @@ var tooltip_template = $(`<div>
 	<div class="cono-add"></div>
 	<div class="cono-add-dialogue">
 		<input type="text"/>
-		<div>press enter to add<div>
+		<div>press enter to add</div>
 	</div>
 </div>
 </div>`);
