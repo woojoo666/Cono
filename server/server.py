@@ -21,7 +21,7 @@ db = client.prod
 def base():
     return "Welcome to Cono."
 
-@app.route("/read")
+@app.route("/read", methods=['GET'])
 def read():
     tag = request.args.get("tag")
     ret = {}
@@ -34,12 +34,13 @@ def read():
         ret[document['entity']['url']] = document['entity']
     return json.dumps(ret)
 
-@app.route("/write")
+@app.route("/write", methods=['POST'])
 def write():
     ret = {}
-    tag = request.args.get("tag")
-    url = request.args.get("url")
-    username = request.args.get("username")
+
+    tag = request.form["tag"]
+    url = request.form["url"]
+    username = request.form["username"]
 
     print(tag, url)
 
@@ -71,12 +72,12 @@ def write():
             entity = {"url" : url, "tag_count" : 1}
             tag_entity_pair = {"tag" : tag}
             db.cono_tag_entity_db.insert_one({"tag": tag, "entity": entity})
-            db.cono_user_tag_url_db.insert_one({"username" : username, "tag" : tag, "url" : url})
             print("Created new tag, entity.")
         except Exception as e:
             ret["exception_message"] = str(e)
             ret["result"] = "Fail"
             return json.dumps(ret)
+        db.cono_user_tag_url_db.insert_one({"username" : username, "tag" : tag, "url" : url})
 
         ret["result"] = "Success"
         return json.dumps(ret)
@@ -87,6 +88,7 @@ def write():
                 entity['tag_count'] += 1
                 print("Incremented tag count to", entity['tag_count'])
                 db.cono_tag_entity_db.replace_one({"tag" : tag}, {"tag": tag, "entity": entity}, True)
+                db.cono_user_tag_url_db.insert_one({"username" : username, "tag" : tag, "url" : url})
                 print("Added to existing entity.")
                 ret["result"] = "Success"
                 return json.dumps(ret)
@@ -94,7 +96,7 @@ def write():
         entity = {"url" : url, "tag_count" : 1}
         tag_entity_pair = {"tag" : tag}
         db.cono_tag_entity_db.insert_one({"tag": tag, "entity": entity})
+        db.cono_user_tag_url_db.insert_one({"username" : username, "tag" : tag, "url" : url})
         print("Added entity to existing tag.")
         ret["result"] = "Success"
         return json.dumps(ret)
-
