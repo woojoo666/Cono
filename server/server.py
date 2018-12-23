@@ -29,7 +29,7 @@ def read():
     documents = db.cono_tag_entity_db.find({"tag":tag})
 
     print (documents.count())
-    for document in documents:`
+    for document in documents:
         print(document['entity'])
         ret[document['entity']['url']] = document['entity']
     return json.dumps(ret)
@@ -78,7 +78,7 @@ def write():
             ret["result"] = "Fail"
             return json.dumps(ret)
         db.cono_user_tag_url_db.insert_one({"username" : username, "tag" : tag, "url" : url})
-
+        
         ret["result"] = "Success"
         return json.dumps(ret)
     else:
