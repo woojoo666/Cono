@@ -1,16 +1,12 @@
-var tooltip_template = $(`<div>
+var tooltip_template = `
 <div class="cono-tooltip">
-	<div class="cono-tag cono-personal">Foo</div>
-	<div class="cono-tag">Bar</div>
-	<div class="cono-tag cono-personal">Baz</div>
-	<div class="cono-tag">Zed</div>
 	<div class="cono-add"></div>
 	<div class="cono-add-dialogue">
 		<input type="text"/>
 		<div>press enter to add</div>
 	</div>
 </div>
-</div>`);
+`;
 
 // TODO: the arrow looks ugly. Instead, we should always have the tooltip display above the link,
 //       so we can get rid of the arrow.
@@ -32,7 +28,7 @@ function createTooltips () {
 	// For every "reference" element, tippy will create a "tippy instance", a clone of our tooltip object.
 	// We need to initialize each one of these clones. Because each tippy instance is lazily created (see Tippy docs),
 	// we wait until the first time it is shown before initializing it.
-	tippyCollection = tippy('a',  { content: tooltip_template.html(), onMount: (tippyInstance) => {
+	tippyCollection = tippy('a',  { content: tooltip_template, onMount: (tippyInstance) => {
 			var element = $(tippyInstance.popper);
 			if (!element.hasClass('cono-tooltip-initialized')) {
 				initTooltip(element); // defined in cono-tooltip.js
