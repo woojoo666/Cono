@@ -21,7 +21,7 @@ db = client.prod
 def base():
     return "Welcome to Cono."
 
-@app.route("/read")
+@app.route("/read", methods=['GET'])
 def read():
     tag = request.args.get("tag")
     ret = {}
@@ -34,11 +34,11 @@ def read():
         ret[document['entity']['url']] = document['entity']
     return json.dumps(ret)
 
-@app.route("/write")
+@app.route("/write", methods=['POST'])
 def write():
     ret = {}
-    tag = request.args.get("tag")
-    url = request.args.get("url")
+    tag = request.form["tag"]
+    url = request.form["url"]
 
     print(tag, url)
 
