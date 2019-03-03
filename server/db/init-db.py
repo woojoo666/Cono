@@ -10,7 +10,8 @@ client = MongoClient()
 db = client.prod
 
 # WARNING: ONLY RUN THE FOLLOWING COMMAND IF YOU WANT TO NUKE THE DB.
-# db.cono_tag_entity_db.drop()
+db.cono_tag_entity_db.drop()
+db.cono_user_tag_url_db.drop()
 
 db.create_collection("cono_tag_entity_db")
 
@@ -20,8 +21,10 @@ query = [('collMod', 'cono_tag_entity_db'),
 query = OrderedDict(query)
 db.command(query)
 
-query = [('collMod', 'user_tag_url_db'),
-        ('validator', schema.tag_entity_validator),
+db.create_collection("cono_user_tag_url_db")
+
+query = [('collMod', 'cono_user_tag_url_db'),
+        ('validator', schema.user_tag_url_validator),
         ('validationLevel', 'moderate')]
 query = OrderedDict(query)
 db.command(query)

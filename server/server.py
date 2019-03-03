@@ -21,6 +21,49 @@ db = client.prod
 def base():
     return "Welcome to Cono."
 
+@app.route("/read-tag-counts", methods=['GET'])
+def read_username():
+    username = request.args.get("username")
+    url = request.args.get("url")
+    ret = {}
+
+    print("username", username, "url", url)
+
+    try:
+        username_tags = db.cono_user_tag_url_db.find({"url" : url})
+    except Exception as e:
+        ret["exception_message"] = str(e)
+        ret["result"] = "Fail"
+        return json.dumps(ret)
+    for entry in username_tags:
+        print(entry)
+
+        first = 0
+        second = False
+        if entry['tag'] in ret:
+            first = ret[entry['tag']][0]
+            second = ret[entry['tag']][1]
+
+        if entry['username'] == username:
+            second = True
+
+        first += 1
+        ret[entry['tag']] = {'count' : first, 'user_tagged' : second}
+    return json.dumps(ret)
+
+@app.route("/read-tags", methods=['GET'])
+def read_tags():
+    url = request.args.get("url")
+    ret = {'tags':[]}
+
+    documents = db.cono_tag_entity_db.find({"entity" : {"url":url}})
+
+    print (documents.count())
+    for document in documents:
+        print(document['tag'])
+        ret['tags'].append(document['tag'])
+    return json.dumps(ret)
+
 @app.route("/read", methods=['GET'])
 def read():
     tag = request.args.get("tag")
@@ -42,10 +85,10 @@ def write():
     url = request.form["url"]
     username = request.form["username"]
 
-    print(tag, url)
+    print(tag, url, username)
 
-    if tag is None or url is None:
-        ret["error_msg"] =  "Both tag and entity must be passed"
+    if tag is None or url is None or username is None:
+        ret["error_msg"] =  "Tag, entity and Username must be passed"
         return json.dumps(ret)
 
 
@@ -56,13 +99,13 @@ def write():
         ret["result"] = "Fail"
         return json.dumps(ret)
     try:
-        username_tags = db.user_tag_url_db.find({"username" : username, "tag" : tag, "url" : url})
+        username_tags = db.cono_user_tag_url_db.find({"username" : username, "tag" : tag, "url" : url})
     except Exception as e:
         ret["exception_message"] = str(e)
         ret["result"] = "Fail"
         return json.dumps(ret)
 
-    if entities.count() == 0:
+    if username_tags.count() != 0:
         print("User has already tagged this url.")
         ret["result"] = "Fail"
         return json.dumps(ret)

@@ -32,7 +32,7 @@ tag_entity_validator = {"$jsonSchema":
 user_tag_url_validator = {"$jsonSchema":
   {
          "bsonType": "object",
-         "required": ["username", "tag", "entity"],
+         "required": ["username", "tag", "url"],
          "properties": {
             "username": {
                "bsonType": "string",
