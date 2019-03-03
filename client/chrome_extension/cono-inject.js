@@ -1,14 +1,9 @@
-var tooltip = document.createElement('div');
-tooltip.innerHTML = `
+var tooltip_template = `
 <div class="cono-tooltip">
-	<div class="cono-tag cono-personal">Foo</div>
-	<div class="cono-tag">Bar</div>
-	<div class="cono-tag cono-personal">Baz</div>
-	<div class="cono-tag">Zed</div>
 	<div class="cono-add"></div>
 	<div class="cono-add-dialogue">
 		<input type="text"/>
-		<div>press enter to add<div>
+		<div>press enter to add</div>
 	</div>
 </div>
 `;
@@ -25,6 +20,7 @@ tippy.setDefaults({
 });
 
 var username;
+var cono_url = '144.202.18.51:5000';
 
 var tippyCollection = null;
 
@@ -32,13 +28,13 @@ function createTooltips () {
 	// For every "reference" element, tippy will create a "tippy instance", a clone of our tooltip object.
 	// We need to initialize each one of these clones. Because each tippy instance is lazily created (see Tippy docs),
 	// we wait until the first time it is shown before initializing it.
-	tippyCollection = tippy(document.querySelectorAll('a'),  { content: tooltip.innerHTML, onMount: (tippyInstance) => {
-			var element = tippyInstance.popperChildren.content;
-			if (!element.classList.contains('cono-tooltip-initialized')) {
+	tippyCollection = tippy('a',  { content: tooltip_template, onMount: (tippyInstance) => {
+			var element = $(tippyInstance.popper);
+			if (!element.hasClass('cono-tooltip-initialized')) {
 				initTooltip(element); // defined in cono-tooltip.js
 
 				// add a tag to prevent it from being initialized multiple times
-				element.classList.add('cono-tooltip-initialized');
+				element.addClass('cono-tooltip-initialized');
 			}
 		},
 	});
