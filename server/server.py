@@ -41,8 +41,8 @@ def read_username():
         first = 0
         second = False
         if entry['tag'] in ret:
-            first = ret[entry['tag']][0]
-            second = ret[entry['tag']][1]
+            first = ret[entry['tag']]['count']
+            second = ret[entry['tag']]['user_tagged']
 
         if entry['username'] == username:
             second = True
