@@ -13,6 +13,10 @@
 
 var username = null;
 
+var cono_url = 'http://144.202.18.51:5000';
+var get_tags_endpoint = cono_url+'/read-tag-counts';
+var add_tags_endpoint = cono_url+'/write';
+
 // TODO: we need to split all message passing into two categories:
 // 1. regular message passing, just request and response
 // 2. state management, involving requests (eg 'popup_init'), updates (eg 'login'), and broadcasts (eg 'login_updated').
@@ -81,4 +85,35 @@ function broadcast(msg, responseFn) {
 			chrome.tabs.sendMessage(tab.id, msg, responseFn);
 		});
 	});
+}
+
+function removeTag (url, tag) {
+	// TODO
+}
+
+function addTag (url, tag) {
+	return postrequest(add_tags_endpoint, { username, url, tag });
+}
+
+function getTags (url) {
+	return getrequest(get_tags_endpoint, { username, url });
+}
+
+// sends a GET request with query params, returns a Promise
+function getrequest(url, params) {
+	var urlObj = new URL(url);
+	Object.keys(params).forEach(key => urlObj.searchParams.append(key, params[key]))
+	return fetch(urlObj).then(response => response.json());
+}
+
+// sends a POST request, returns a Promise
+function postrequest(url, data) {
+	var urlEncoded = Object.keys(data).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&');
+	return fetch(url, {
+		method: 'POST',
+		body: urlEncoded,
+		headers: {
+			'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+		},
+	}).then(response => response.json());
 }
