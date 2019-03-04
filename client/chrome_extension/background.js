@@ -58,6 +58,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 				chrome.tabs.sendMessage(tab.id, {action: 'get-tooltips-enabled'}, response => sendResponse(response) )
 			});
 			return true; // return true to indicate that we are sending a response asynchronously
+		case 'get_tags':
+			getTags(request.url)
+				.then(response => sendResponse(response))
+				.catch(error => {
+					// note: we can't send the raw error object back, so we report the error here, and send a custom error object in the response
+					console.log(error);
+					sendResponse({error: true, errorMessage: 'Error getting tags for ' + request.url})
+			});
+			return true; // return true to indicate that we are sending a response asynchronously
 	}
 	sendResponse(response);
 });

@@ -30,8 +30,9 @@ function createTooltips () {
 	// we wait until the first time it is shown before initializing it.
 	tippyCollection = tippy('a',  { content: tooltip_template, onMount: (tippyInstance) => {
 			var element = $(tippyInstance.popper);
+			var link = tippyInstance.reference.href;
 			if (!element.hasClass('cono-tooltip-initialized')) {
-				initTooltip(element); // defined in cono-tooltip.js
+				initTooltip(element, link); // defined in cono-tooltip.js
 
 				// add a tag to prevent it from being initialized multiple times
 				element.addClass('cono-tooltip-initialized');
