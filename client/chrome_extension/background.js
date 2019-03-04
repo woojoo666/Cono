@@ -64,7 +64,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 				.catch(error => {
 					// note: we can't send the raw error object back, so we report the error here, and send a custom error object in the response
 					console.log(error);
-					sendResponse({error: true, errorMessage: 'Error getting tags for ' + request.url})
+					sendResponse({result: 'Fail', errorMessage: 'Error getting tags for ' + request.url + '. Check background script log for more details'})
+			});
+			return true; // return true to indicate that we are sending a response asynchronously
+		case 'add_tag':
+			addTag(request.url, request.tag)
+				.then(response => sendResponse(response))
+				.catch(error => {
+					// note: we can't send the raw error object back, so we report the error here, and send a custom error object in the response
+					console.log(error);
+					sendResponse({result: 'Fail', errorMessage: 'Error adding tag ' + request.tag + ' for ' + request.url + '. Check background script log'})
 			});
 			return true; // return true to indicate that we are sending a response asynchronously
 	}

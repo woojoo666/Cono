@@ -1,8 +1,4 @@
-var tag_template = $('<div class="cono-tag"></div>')
-		.click(e => {
-			// TODO: send tag add/remove to backend
-			$(e.target).toggleClass('cono-user-tagged');
-		});
+var tag_template = $('<div class="cono-tag"></div>');
 
 var testData = {
 	'good': { count: 3, user_tagged: true },
@@ -18,10 +14,23 @@ function testGet (url) {
 function getTags(url) {
 	return new Promise((resolve, reject) => {
 		chrome.extension.sendMessage({action: 'get_tags', url}, response => {
-			if (response.error) throw new Error(response.errorMessage);
+			if (response.result && response.result == 'Fail') throw new Error(response.errorMessage);
 			else resolve(response);
 		});
 	});
+}
+
+function addTag(url, tag) {
+	return new Promise((resolve, reject) => {
+		chrome.extension.sendMessage({action: 'add_tag', url, tag}, response => {
+			if (response.result && response.result == 'Fail') throw new Error(response.errorMessage);
+			else resolve(response);
+		});
+	});
+}
+
+function removeTag(url, tag) {
+	return Promise.reject(new Error('remove tag not implemented'));
 }
 
 // initializes and adds click listeners to a tooltip
@@ -32,6 +41,15 @@ function initTooltip(element, link) {
 		element.find('.cono-add-dialogue').toggleClass('cono-adding');
 	});
 
+	element.find('.cono-add-dialogue input').keypress(e => {
+		if (e.key == 'Enter') {
+			var tag = $(e.target).val();
+			console.log('unimplemented: add tag ' + tag);
+			// TODO: notice that the tag might already exist in the tag list
+			// best way might be to just refresh the whole tag list
+		}
+	})
+
 	//testGet(link) // test using local data
 	getTags(link)
 	.then(tags => {
@@ -40,6 +58,21 @@ function initTooltip(element, link) {
 				.clone(true) // clone template with event handlers
 				.text(tag + ' | ' + count)
 				.toggleClass('cono-user-tagged', user_tagged)
+				.click(e => {
+					var elem = $(e.target);
+					var promise = user_tagged ? removeTag(link, tag) : addTag(link, tag);
+					promise.then(() => {
+						// if the promise succeeds, the tag was toggled
+						user_tagged = !user_tagged;
+						if (user_tagged) {
+							count++;
+						} else {
+							count--;
+						}
+						elem.text(tag + ' | ' + count) // update text
+						elem.toggleClass('cono-user-tagged', user_tagged);
+					}).catch(error => console.log(error));
+				})
 				.prependTo( element.find('.cono-tooltip') );
 		});
 	});
