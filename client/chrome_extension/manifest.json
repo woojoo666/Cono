@@ -9,7 +9,7 @@
 
 	"background": {
 		"persistent": false,
-		"scripts": ["background.js"]
+		"scripts": ["background.js", "background-tests.js"]
 	},
 	"content_scripts": [{
 			"matches": ["<all_urls>"],
