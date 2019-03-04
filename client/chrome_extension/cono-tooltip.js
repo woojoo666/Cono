@@ -44,36 +44,79 @@ function initTooltip(element, link) {
 	element.find('.cono-add-dialogue input').keypress(e => {
 		if (e.key == 'Enter') {
 			var tag = $(e.target).val();
-			console.log('unimplemented: add tag ' + tag);
-			// TODO: notice that the tag might already exist in the tag list
-			// best way might be to just refresh the whole tag list
+			if (tagObjs[tag] && tagObjs[tag].user_tagged) {
+				// already user tagged
+				// TODO: flash the tag to show the user that it was already tagged.
+				finish();
+				return;
+			}
+
+			addTag(link, tag)
+				.then(() => { // success, tag added
+					if (tagObjs[tag]) {
+						if (tagObjs[tag].user_tagged) {
+							// this case should have been handled already, we shouldn't ever reach this code block
+							throw "this code block should not be run, figure out how we got here";
+						} else {
+							tagObjs[tag].count++;
+							tagObjs[tag].user_tagged = true;
+							tagObjs.refresh();
+						}
+					} else {
+						createTagObject(tag, 1, true);
+					}
+					finish();
+				})
+				.catch(error => console.log(error));
+
+			function finish() {
+				// close text input dialog
+				element.find('.cono-add').removeClass('cono-adding');
+				element.find('.cono-add-dialogue').removeClass('cono-adding');
+			}
 		}
 	})
+
+	var tagObjs = {};
 
 	//testGet(link) // test using local data
 	getTags(link)
 	.then(tags => {
-		Object.entries(tags).forEach(([tag, {count, user_tagged = false}]) => {
+		Object.entries(tags).forEach(([tag, {count, user_tagged = false}]) => createTagObject(tag, count, user_tagged));
+	});
+
+	function createTagObject(tag, count, user_tagged) {
+		// TODO: maybe this should be a class
+		var me = { count, user_tagged };
+		tagObjs[tag] = me;
+
+		me.elem =
 			tag_template
 				.clone(true) // clone template with event handlers
-				.text(tag + ' | ' + count)
-				.toggleClass('cono-user-tagged', user_tagged)
-				.click(e => {
-					var elem = $(e.target);
-					var promise = user_tagged ? removeTag(link, tag) : addTag(link, tag);
-					promise.then(() => {
-						// if the promise succeeds, the tag was toggled
-						user_tagged = !user_tagged;
-						if (user_tagged) {
-							count++;
-						} else {
-							count--;
-						}
-						elem.text(tag + ' | ' + count) // update text
-						elem.toggleClass('cono-user-tagged', user_tagged);
-					}).catch(error => console.log(error));
-				})
+				.click(() => me.toggle())
 				.prependTo( element.find('.cono-tooltip') );
-		});
-	});
+
+		me.toggle = function () {
+			console.log("toggle tag");
+			var promise = this.user_tagged ? removeTag(link, tag) : addTag(link, tag);
+			promise.then(() => {
+				// if the promise succeeds, the tag was toggled
+				this.user_tagged = !this.user_tagged;
+				if (this.user_tagged) {
+					this.count++;
+				} else {
+					this.count--;
+				}
+				this.refresh();
+			}).catch(error => console.log(error));
+		}
+
+		me.refresh = function () {
+			this.elem
+				.text(tag + ' | ' + this.count) // update text
+				.toggleClass('cono-user-tagged', this.user_tagged);
+		}
+
+		me.refresh(); // initialize element
+	}
 }
